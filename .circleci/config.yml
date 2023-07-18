@@ -1,5 +1,13 @@
 version: 2.1
 
+executors:
+  container:
+    docker:
+      - image: cimg/base:current
+  linux-vm:
+    machine:
+      image: ubuntu-2004:current
+
 jobs:
   hello-job:
     docker:
@@ -8,7 +16,22 @@ jobs:
       - checkout # check out the code in the project directory
       - run: echo "hello world" # run the `echo` command
 
+  test-job:
+    executor: container
+    steps:
+      - run: echo uname -r
+
+
 workflows:
-  my-workflow:
+  first-workflow:
     jobs:
       - hello-job
+      - test-job
+  second-workflow:
+    jobs:
+      - hello-job:
+          filters:
+            branches:
+              only:
+                - dev
+                - /test-.*/
